@@ -1,11 +1,7 @@
-import { AuthProvider } from "./context/AuthContext";
+import Login from "./pages/Login";
 
 function App() {
-  return (
-    <AuthProvider>
-      <YourRoutesOrComponents />
-    </AuthProvider>
-  );
+  return <Login />;
 }
 
 export default App;
