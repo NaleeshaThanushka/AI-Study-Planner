@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [plans, setPlans] = useState([]);
@@ -25,7 +25,6 @@ const Dashboard = () => {
   // Create plan
   const createPlan = async () => {
     if (!title || !subject) return alert("Title & Subject required");
-
     await api.post("/plans", { title, subject });
     setTitle("");
     setSubject("");
@@ -53,6 +52,12 @@ const Dashboard = () => {
     fetchPlans();
   };
 
+  // Logout handler
+  const handleLogout = () => {
+    logout();          // clears token inside AuthContext
+    navigate("/");     // redirect to login/home
+  };
+
   // Sort: incomplete first
   const sortedPlans = [...plans].sort(
     (a, b) => a.completed - b.completed
@@ -62,19 +67,10 @@ const Dashboard = () => {
     <div style={{ padding: 40 }}>
       <h2>📚 My Study Plans</h2>
 
-      {/* Logout */}
-      <button
-        onClick={() => {
-          logout();
-          navigate("/");
-        }}
-      >
-        Logout
-      </button>
+      <button onClick={handleLogout}>Logout</button>
 
       <hr />
 
-      {/* Create Plan */}
       <h3>Add New Plan</h3>
       <input
         placeholder="Title"
@@ -90,7 +86,6 @@ const Dashboard = () => {
 
       <hr />
 
-      {/* Plans List */}
       <ul>
         {sortedPlans.map((p) => (
           <li key={p._id} style={{ marginBottom: 10 }}>
@@ -111,7 +106,7 @@ const Dashboard = () => {
                 <span
                   style={{
                     textDecoration: p.completed ? "line-through" : "none",
-                    marginRight: 10
+                    marginRight: 10,
                   }}
                 >
                   {p.title} - {p.subject}
