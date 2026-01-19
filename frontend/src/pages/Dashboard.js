@@ -54,14 +54,32 @@ const Dashboard = () => {
 
   // Logout handler
   const handleLogout = () => {
-    logout();          // clears token inside AuthContext
-    navigate("/");     // redirect to login/home
+    logout();
+    navigate("/");
+  };
+
+  // ✅ OpenAI suggestion
+  const getOpenAISuggestion = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/ai/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ subject, hours: 3 }), // you can make hours dynamic
+      });
+
+      const data = await res.json();
+      alert(data.suggestion);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to get AI suggestion");
+    }
   };
 
   // Sort: incomplete first
-  const sortedPlans = [...plans].sort(
-    (a, b) => a.completed - b.completed
-  );
+  const sortedPlans = [...plans].sort((a, b) => a.completed - b.completed);
 
   return (
     <div style={{ padding: 40 }}>
@@ -83,6 +101,10 @@ const Dashboard = () => {
         onChange={(e) => setSubject(e.target.value)}
       />
       <button onClick={createPlan}>Add</button>
+
+      <button style={{ marginLeft: 10 }} onClick={getOpenAISuggestion}>
+        Get AI Suggestion
+      </button>
 
       <hr />
 
