@@ -1,0 +1,78 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f7efe5, #e3d5c8);
+  font-family: "Segoe UI", sans-serif;
+}
+
+.login-card {
+  background: #fff;
+  padding: 40px;
+  width: 320px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.login-card h2 {
+  margin-bottom: 20px;
+  color: #5a3e2b;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 6px;
+  border: 1px solid #c4a484;
+  font-size: 14px;
+}
+
+.login-card input:focus {
+  outline: none;
+  border-color: #8b5e3c;
+}
+
+.login-card button {
+  width: 100%;
+  padding: 12px;
+  background: #8b5e3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.login-card button:hover {
+  background: #6f462a;
+}
+
+.login-msg {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #b33a3a;
+}
+
+.login-msg.success {
+  color: #2e7d32;
+}
+.login-footer {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.register-link {
+  margin-left: 6px;
+  color: #8b5e3c;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+

@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
+import "../pages/Dashbord.css";
 
 const Dashboard = () => {
   const [plans, setPlans] = useState([]);
@@ -12,7 +13,6 @@ const Dashboard = () => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Fetch plans
   const fetchPlans = async () => {
     const res = await api.get("/plans");
     setPlans(res.data);
@@ -22,7 +22,6 @@ const Dashboard = () => {
     fetchPlans();
   }, []);
 
-  // Create plan
   const createPlan = async () => {
     if (!title || !subject) return alert("Title & Subject required");
     await api.post("/plans", { title, subject });
@@ -31,19 +30,16 @@ const Dashboard = () => {
     fetchPlans();
   };
 
-  // Delete plan
   const deletePlan = async (id) => {
     await api.delete(`/plans/${id}`);
     fetchPlans();
   };
 
-  // Mark completed
   const markDone = async (id) => {
     await api.put(`/plans/${id}`, { completed: true });
     fetchPlans();
   };
 
-  // Update plan
   const updatePlan = async (id) => {
     await api.put(`/plans/${id}`, { title, subject });
     setEditId(null);
@@ -52,103 +48,90 @@ const Dashboard = () => {
     fetchPlans();
   };
 
-  // Logout handler
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  // ✅ OpenAI suggestion
   const getOpenAISuggestion = async () => {
-  try {
-    if (!subject) return alert("Enter subject first");
+    try {
+      if (!subject) return alert("Enter subject first");
+      const res = await api.post("/ai/suggest", { subject, hours: 3 });
+      alert(res.data.suggestion);
+    } catch {
+      alert("Failed to get AI suggestion");
+    }
+  };
 
-    const res = await api.post(
-      "/ai/suggest",
-      { subject, hours: 3 },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-
-    alert(res.data.suggestion);
-  } catch (error) {
-    console.error(error);
-    alert("Failed to get AI suggestion");
-  }
-};
-
-  // Sort: incomplete first
   const sortedPlans = [...plans].sort((a, b) => a.completed - b.completed);
 
   return (
-    <div style={{ padding: 40 }}>
-      <h2>📚 My Study Plans</h2>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h2>📚 My Study Plans</h2>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
 
-      <button onClick={handleLogout}>Logout</button>
+      <div className="add-plan">
+        <h3>Add New Plan</h3>
+        <input
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <input
+          placeholder="Subject"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        />
+        <button onClick={createPlan}>Add</button>
+        <button className="ai-btn" onClick={getOpenAISuggestion}>
+          AI Suggestion
+        </button>
+      </div>
 
-      <hr />
-
-      <h3>Add New Plan</h3>
-      <input
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <input
-        placeholder="Subject"
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
-      />
-      <button onClick={createPlan}>Add</button>
-
-      <button style={{ marginLeft: 10 }} onClick={getOpenAISuggestion}>
-        Get AI Suggestion
-      </button>
-
-      <hr />
-
-      <ul>
+      <ul className="plan-list">
         {sortedPlans.map((p) => (
-          <li key={p._id} style={{ marginBottom: 10 }}>
+          <li key={p._id} className="plan-item">
             {editId === p._id ? (
               <>
-                <input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-                <input
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                />
+                <input value={title} onChange={(e) => setTitle(e.target.value)} />
+                <input value={subject} onChange={(e) => setSubject(e.target.value)} />
                 <button onClick={() => updatePlan(p._id)}>Save</button>
               </>
             ) : (
               <>
                 <span
-                  style={{
-                    textDecoration: p.completed ? "line-through" : "none",
-                    marginRight: 10,
-                  }}
+                  className={`plan-text ${p.completed ? "completed" : ""}`}
                 >
                   {p.title} - {p.subject}
                 </span>
 
-                {!p.completed && (
-                  <button onClick={() => markDone(p._id)}>✔</button>
-                )}
-                <button
-                  onClick={() => {
-                    setEditId(p._id);
-                    setTitle(p.title);
-                    setSubject(p.subject);
-                  }}
-                >
-                  ✏️
-                </button>
-                <button onClick={() => deletePlan(p._id)}>❌</button>
+                <div className="plan-actions">
+                  {!p.completed && (
+                    <button className="done-btn" onClick={() => markDone(p._id)}>
+                      ✔
+                    </button>
+                  )}
+                  <button
+                    className="edit-btn"
+                    onClick={() => {
+                      setEditId(p._id);
+                      setTitle(p.title);
+                      setSubject(p.subject);
+                    }}
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => deletePlan(p._id)}
+                  >
+                    ❌
+                  </button>
+                </div>
               </>
             )}
           </li>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../api/axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import "./Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -8,19 +9,12 @@ const Login = () => {
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
 
-  // ✅ Correct handleLogin
   const handleLogin = async (e) => {
-    e.preventDefault(); // prevent form reload
+    e.preventDefault();
     try {
       const res = await api.post("/auth/login", { email, password });
-
-      // Store token
       localStorage.setItem("token", res.data.token);
-
-      // Optional message
       setMsg("Login successful!");
-      
-      // Navigate to Dashboard
       navigate("/dashboard");
     } catch (err) {
       setMsg(err.response?.data?.message || "Login failed");
@@ -28,44 +22,39 @@ const Login = () => {
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h2>Login</h2>
+    <div className="login-container">
+      <div className="login-card">
+        <h2>Login</h2>
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        /><br/><br/>
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        /><br/><br/>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        <button type="submit">
-          Login
-        </button>
-      </form>
+          <button type="submit">Login</button>
+        </form>
 
-      <p>{msg}</p>
+        {msg && <p className="login-msg">{msg}</p>}
 
-      {/* Optional: Test Protected API */}
-      <button
-        onClick={async () => {
-          try {
-            const res = await api.get("/protected");
-            alert(res.data.message);
-          } catch (err) {
-            alert(err.response?.data?.message || "Access denied");
-          }
-        }}
-      >
-        Test Protected API
-      </button>
+        <div className="login-footer">
+          <span>Don’t have an account?</span>
+          <Link to="/register" className="register-link">
+            Register
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };
