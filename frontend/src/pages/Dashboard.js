@@ -60,23 +60,25 @@ const Dashboard = () => {
 
   // ✅ OpenAI suggestion
   const getOpenAISuggestion = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/ai/openai", {
-        method: "POST",
+  try {
+    if (!subject) return alert("Enter subject first");
+
+    const res = await api.post(
+      "/ai/suggest",
+      { subject, hours: 3 },
+      {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ subject, hours: 3 }), // you can make hours dynamic
-      });
+      }
+    );
 
-      const data = await res.json();
-      alert(data.suggestion);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to get AI suggestion");
-    }
-  };
+    alert(res.data.suggestion);
+  } catch (error) {
+    console.error(error);
+    alert("Failed to get AI suggestion");
+  }
+};
 
   // Sort: incomplete first
   const sortedPlans = [...plans].sort((a, b) => a.completed - b.completed);
